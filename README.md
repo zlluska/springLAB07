@@ -1,41 +1,113 @@
-# Lab 07
-O lab 07 se trata de um projeto em grupo para o controle de ponto de uma empresa contendo uma API REST e uma aplicação web (Front e back). Construida em java Spring boot via back end.  prioriza codigo limpo e implementação de padrões de projetos MVC sendo model e control pela API e view pelo front end
+# ⏱️ Sistema de Controle de Ponto Eletrônico (Lab 07)
 
-## Problemas a serem soluciondos
+![Java](https://img.shields.io/badge/Java_21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
-essa api serve para resolver problemas simples na hora de registrar dados sobre funcionários como
+Sistema corporativo de **Controle de Ponto Eletrônico e Banco de Horas** desenvolvido em grupo com foco em **Clean Code**, modelagem rica de domínio (**DDD** / *Value Objects*) e arquitetura em camadas utilizando **Java 21** e **Spring Boot**.
 
-- horário de entrada do funcionário
-- horário de saida do funcionário
-- banco de horas (ou horas extras)
-- declaração de horas (caso precise entrar mais tarde ou sair mais cedo)
-- atestados (ausências)
+---
 
-## Rodar o projeto
+## 🎯 Problemas Solucionados
 
-- como o projeto está sido dockerizado só é necessário rodar os comandos
+A aplicação gerencia todo o ciclo de jornada de trabalho de colaboradores de uma empresa:
 
-`Docker compose up` (primeira vez subindo os container na maquina)
+- **Registro de Ponto (`TimeRecord`):** Horários de entrada, pausa, retorno e saída com rastreamento de origem (Web, Mobile, Biometria).
+- **Gestão de Contratos e Escalas (`Contract` & `WorkSchedule`):** Controle de vínculo contratual (CLT, Estágio, PJ) e jornadas por dia da semana.
+- **Banco de Horas (`HourBank` & `HourBankMovement`):** Apuração automática de saldo, créditos de horas extras e compensações.
+- **Justificativas e Atestados (`Justification`):** Solicitação e fluxo de aprovação de ausências, atestados médicos e declarações de horas.
+- **Value Objects Validados (`CPF` & `Email`):** Validação estrita no domínio com testes unitários e de persistência JPA.
 
-`Docker compose -f docker-compose.yml up build -d` (conforme atualizações vão surgindo)
+---
 
+## 🏛️ Modelo Conceitual (Domínio)
 
-## modelo conceitual
-Diagrama de classe
+```mermaid
+erDiagram
+    EMPLOYEE ||--o{ CONTRACT : "possui"
+    CONTRACT ||--o{ WORK_SCHEDULE : "define"
+    CONTRACT ||--o{ TIME_RECORD : "registra"
+    CONTRACT ||--|| HOUR_BANK : "mantém"
+    HOUR_BANK ||--o{ HOUR_BANK_MOVEMENT : "movimenta"
+    CONTRACT ||--o{ JUSTIFICATION : "solicita"
 
-## Stacks utilizadas
+    EMPLOYEE {
+        Long id
+        String name
+        CPF cpf
+        Email email
+        EmployeeStatusEnum status
+    }
+    CONTRACT {
+        Long id
+        ContractTypeEnum type
+        ContractStatusEnum status
+        LocalDate startDate
+    }
+    TIME_RECORD {
+        Long id
+        LocalDateTime timestamp
+        TimeRecordTypeEnum type
+        TimeRecordOriginEnum origin
+    }
+    HOUR_BANK {
+        Long id
+        Duration balance
+    }
+    JUSTIFICATION {
+        Long id
+        JustificationTypeEnum type
+        ApprovalStatusEnum approvalStatus
+    }
+```
 
-- Java 21
-- Spring boot
-- Spring data JPA
-- Spring boot starter web
-- Spring book dev tools
-- docker
-- postgresSQL
+---
 
-## Endpoints
-| Método | Endpoint           | Descrição                                                       |
-|--------|--------------------|------------------------------------------------------------------|
+## 🛠️ Stack Tecnológica
 
+| Categoria | Tecnologia |
+| :--- | :--- |
+| **Linguagem** | Java 21 |
+| **Framework Backend** | Spring Boot 3, Spring Web, Spring Data JPA |
+| **Banco de Dados** | PostgreSQL |
+| **Containerização** | Docker & Docker Compose |
+| **Testes** | JUnit 5, Spring Boot Test |
 
+---
 
+## 📂 Estrutura de Pacotes
+
+```text
+src/
+├── main/java/com/project/ponto/
+│   ├── domain/
+│   │   ├── enums/          # Estados e tipos (ContractType, ApprovalStatus, etc.)
+│   │   ├── model/          # Entidades JPA (Employee, Contract, HourBank, TimeRecord...)
+│   │   └── vo/             # Value Objects imutáveis e validados (CPF, Email)
+│   └── pontoApplication.java
+└── test/java/com/project/ponto/
+    └── domain/vo/          # Testes unitários e de persistência (CPFTest, EmailTest...)
+```
+
+---
+
+## 🚀 Como Executar o Projeto
+
+### Usando Docker Compose (Recomendado)
+
+1. Suba os containers pela primeira vez:
+   ```bash
+   docker compose up
+   ```
+
+2. Para reconstruir em segundo plano após alterações:
+   ```bash
+   docker compose -f docker-compose.yml up --build -d
+   ```
+
+### Executando os Testes Localmente (Maven Wrapper)
+
+```bash
+./mvnw test
+```

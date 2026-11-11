@@ -111,3 +111,19 @@ src/
 ```bash
 ./mvnw test
 ```
+
+---
+
+## ⚠️ Limitações Atuais & Roadmap
+
+Seguindo boas práticas de transparência arquitetural:
+
+- **Foco Atual no Núcleo de Domínio (DDD):** Esta versão consolida a camada de domínio rica (entidades JPA, relacionamentos, *Value Objects* `CPF` e `Email` e testes de persistência). Os endpoints REST (`Controllers`) e autenticação `Spring Security / JWT` estão previstos na próxima iteração.
+- ** Migrações de Banco:** Atualmente utiliza `spring.jpa.hibernate.ddl-auto` para geração de schema em desenvolvimento; para produção, planeja-se versionamento determinístico via **Flyway**.
+
+---
+
+## 📝 Licença
+
+Distribuído sob a licença **MIT**. Veja [`LICENSE`](./LICENSE) para mais detalhes.
+
